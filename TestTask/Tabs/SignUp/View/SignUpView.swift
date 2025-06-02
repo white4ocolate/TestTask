@@ -12,19 +12,23 @@ struct SignUpView: View {
     @State private var showActionSheet = false
     @State private var showImagePicker = false
     @State private var showCamera = false
+
+    // Disable the sign-up button if all fields are empty
     private var disabled: Bool {
-        return vm.name.isEmpty && vm.email.isEmpty && vm.phone.isEmpty && (vm.image == nil)
+        return vm.userName.isEmpty && vm.userEmail.isEmpty && vm.userPhone.isEmpty && (vm.userImage == nil)
     }
 
     var body: some View {
         ZStack {
             Color.white.ignoresSafeArea()
 
+            // Show loading spinner while data is loading
             if vm.isLoading {
                 ProgressView()
                     .tint(.gray)
             }
 
+            // Show loading spinner if positions list is still loading
             if vm.positions.isEmpty {
                 ProgressView()
                     .tint(.gray)
@@ -35,16 +39,16 @@ struct SignUpView: View {
 
                             Spacer()
 
+                            // Input fields
                             VStack {
                                 nameTextField
-
                                 emailTextField
-
                                 phoneTextField
                             }
 
                             Spacer()
 
+                            // Position selection
                             VStack(spacing: 12) {
                                 Text("Select your position")
                                     .typography(.body2)
@@ -54,6 +58,7 @@ struct SignUpView: View {
                                 VStack(spacing: 0) {
                                     ForEach(vm.positions) { position in
                                         HStack(spacing: 8) {
+                                            // Display selection indicator (filled or empty circle)
                                             Group {
                                                 if position.id == vm.positionID {
                                                     Circle()
@@ -79,7 +84,7 @@ struct SignUpView: View {
                                         }
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .onTapGesture {
-                                            vm.positionID = position.id
+                                            vm.positionID = position.id // Update selected position
                                         }
                                     }
                                 }
@@ -87,6 +92,7 @@ struct SignUpView: View {
 
                             Spacer()
 
+                            // Photo upload field
                             photoField
 
                             Spacer()
@@ -111,11 +117,13 @@ struct SignUpView: View {
             }
         }
         .onAppear {
-            vm.loadAllPositionsIfNeeded()
+            vm.loadAllPositionsIfNeeded()   // Load positions only once
         }
         .onTapGesture {
-            hideKeyboard()
+            hideKeyboard()  // Hide keyboard when tapping outside
         }
+
+        // Image picker option dialog
         .confirmationDialog("Choose how you want to add a photo", isPresented: $showActionSheet, titleVisibility: .visible) {
             Button("Camera") {
                 vm.sourceType = .camera
@@ -129,16 +137,22 @@ struct SignUpView: View {
 
             Button("Cancel", role: .cancel) {}
         }
+
+        // Open photo picker
         .sheet(isPresented: $showImagePicker) {
             PhotoPicker { selectedImage, name in
                 vm.setImage(image: selectedImage, name: name)
             }
         }
+
+        // Open camera
         .fullScreenCover(isPresented: $showCamera) {
             ImagePicker(sourceType: .camera) { selectedImage, name in
                 vm.setImage(image: selectedImage, name: name)
             }.ignoresSafeArea()
         }
+
+        // Show result after submission
         .fullScreenCover(isPresented: $vm.isSent) {
             InformView(isSuccess: $vm.isSuccess, message: vm.errorMessage)
         }
@@ -146,8 +160,9 @@ struct SignUpView: View {
 }
 
 private extension SignUpView {
+    // Name input field
     private var nameTextField: some View {
-        TextFieldWithPlaceHolder(value: $vm.name,
+        TextFieldWithPlaceHolder(value: $vm.userName,
                                  placeholder: "Your name",
                                  bottomLabel: $vm.bottomLabelName,
                                  rules: [.required(message: "Required field")],
@@ -155,8 +170,9 @@ private extension SignUpView {
         .focused($focusedField, equals: .name)
     }
 
+    // Email input field
     private var emailTextField: some View {
-        TextFieldWithPlaceHolder(value: $vm.email,
+        TextFieldWithPlaceHolder(value: $vm.userEmail,
                                  placeholder: "Email",
                                  bottomLabel: $vm.bottomLabelEmail,
                                  rules: [.required(message: "Required field"), .email(message: "Invalid email format")],
@@ -164,8 +180,9 @@ private extension SignUpView {
         .focused($focusedField, equals: .email)
     }
 
+    // Phone input field with number pad and formatting
     private var phoneTextField: some View {
-        TextFieldWithPlaceHolder(value: $vm.phone,
+        TextFieldWithPlaceHolder(value: $vm.userPhone,
                                  placeholder: "Phone",
                                  keyboardType: .numberPad, bottomLabel: vm.isCorrectPhone ? $vm.errorBottomLabelPhone : $vm.errorBottomLabelPhone,
                                  rules: [.required(message: "Required field"), .phoneUA(message: "Invalid phone format")],
@@ -174,6 +191,7 @@ private extension SignUpView {
         .focused($focusedField, equals: .phone)
     }
 
+    // Photo selection field with error handling
     private var photoField: some View {
         VStack(spacing: 4) {
             RoundedRectangle(cornerRadius: 4)
@@ -196,9 +214,10 @@ private extension SignUpView {
                     .padding(.trailing, 8)
                 }
                 .onTapGesture {
-                    showActionSheet = true
+                    showActionSheet = true  // Show camera/gallery options
                 }
 
+            // Show validation error message
             Text(!vm.isCorrectPhoto ? vm.bottomLabelPhoto : "")
                 .typography(.bodySmall)
                 .foregroundStyle(Color.c_Error)

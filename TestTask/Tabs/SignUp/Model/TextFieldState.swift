@@ -5,6 +5,7 @@
 
 import SwiftUI
 
+// Represents the different visual states of a custom text field
 enum TextFieldState {
     case enabled
     case enabledFilled
@@ -13,6 +14,7 @@ enum TextFieldState {
     case error
     case errorFilled
 
+    // Returns the appropriate border color based on the current state
     var borderColor: Color {
         switch self {
         case .enabled, .enabledFilled:
@@ -24,6 +26,7 @@ enum TextFieldState {
         }
     }
 
+    // Returns the appropriate placeholder text color based on the current state
     var placeHolderColor: Color {
         switch self {
         case .enabled:

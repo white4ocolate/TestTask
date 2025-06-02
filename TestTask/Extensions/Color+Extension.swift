@@ -5,6 +5,8 @@
 
 import SwiftUI
 
+/// Centralized extension for accessing app-specific color assets.
+/// This improves code readability and enforces a consistent design system across the app.
 extension Color {
     static let c_primary = Color("CustomPrimary")
     static let c_secondary = Color("CustomSecondary")

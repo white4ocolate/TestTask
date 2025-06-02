@@ -5,8 +5,10 @@
 
 import SwiftUI
 
+/// A reusable top bar view with a centered title and primary background color
 struct TopBarView: View {
     var title: String
+
     var body: some View {
         Text(title)
             .typography(.heading1)

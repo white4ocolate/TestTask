@@ -15,6 +15,7 @@ class UsersViewModel: ObservableObject {
     private let count = 6
 
     init() {
+        // Automatically load users when the view model is initialized
         Task {
             await loadUsers()
         }
@@ -22,23 +23,19 @@ class UsersViewModel: ObservableObject {
 
     @MainActor
     func loadUsers() async {
+        // Prevent duplicate loading and stop if no more pages
         guard !isLoading, hasMorePages else { return }
         isLoading = true
 
-        let urlString = "https://frontend-test-assignment-api.abz.agency/api/v1/users?page=\(currentPage)&count=\(count)"
-        guard let url = URL(string: urlString) else {
-            isLoading = false
-            return
-        }
-
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            if let decodedData = try? JSONDecoder().decode(UsersResponse.self, from: data),
-               decodedData.success,
-               let newUsers = decodedData.users {
+            let response = try await UserService.fetchUsers(page: currentPage, count: count)
+
+            if let decodedData = response, decodedData.success, let newUsers = decodedData.users {
                 await MainActor.run {
                     self.users.append(contentsOf: newUsers)
                     self.currentPage += 1
+
+                    // Check if there are more pages to load
                     self.hasMorePages = self.currentPage <= decodedData.total_pages
                 }
             }
@@ -46,6 +43,7 @@ class UsersViewModel: ObservableObject {
             print("Error:", error.localizedDescription)
         }
         await MainActor.run {
+            // Mark loading as finished
             self.isLoading = false
             self.didLoadOnce = true
         }

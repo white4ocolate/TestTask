@@ -5,11 +5,14 @@
 
 import SwiftUI
 
+/// A view that displays a user's profile card with avatar, name, position, email, and phone
 struct UserCardView: View {
     var user: User
-    var isLast: Bool
+    var isLast: Bool    // Determines whether to show a divider under the card
+
     var body: some View {
         HStack(alignment:.top, spacing: 16) {
+            // Load user photo from URL or show placeholder if loading
             AsyncImage(url: URL(string: user.photo)) { image in
                 image
                     .resizable()
@@ -19,10 +22,11 @@ struct UserCardView: View {
             }
             .scaledToFill()
             .frame(width: 50, height: 50)
-            .clipShape(Circle())
+            .clipShape(Circle())    // Make image circular
             .clipped()
 
             VStack(alignment: .leading, spacing: 8) {
+                // User name and position
                 VStack(alignment: .leading, spacing: 4) {
                     Text(user.name)
                         .typography(.body2)
@@ -32,6 +36,8 @@ struct UserCardView: View {
                         .typography(.body3)
                         .foregroundStyle(Color.c_black60)
                 }
+
+                // User email and phone number
                 VStack(alignment: .leading, spacing: 4) {
                     Text(AttributedString(user.email))
                         .typography(.body3)
@@ -42,6 +48,7 @@ struct UserCardView: View {
                 }
                 .padding(.bottom, 24)
 
+                // Add divider if this is not the last user
                 if !isLast {
                     Divider()
                 }

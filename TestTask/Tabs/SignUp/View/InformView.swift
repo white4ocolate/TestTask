@@ -6,22 +6,26 @@
 import SwiftUI
 
 struct InformView: View {
-    @Environment(\.dismiss) var dismiss
-    @Binding var isSuccess: Bool
-    var message: String = "That email is already registered"
+    @Environment(\.dismiss) var dismiss // Allows the view to dismiss itself
+    @Binding var isSuccess: Bool        // Determines if the result was successful or not
+    var message: String = "That email is already registered"    // Default error message
 
     var body: some View {
         ZStack {
             Color.c_background.ignoresSafeArea()
             VStack(spacing: 24) {
+                // Display success or error image
                 Image(isSuccess ? .success : .error)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 200)
+
+                // Show success message or custom error message
                 Text(isSuccess ? "User successfully registered" : message)
                     .typography(.heading1)
                     .foregroundStyle(Color.c_black87)
 
+                // Button to dismiss view
                 Button(isSuccess ? "Got it" : "Try again") {
                     dismiss()
                 }
@@ -29,6 +33,8 @@ struct InformView: View {
             }
         }
         .frame(maxHeight: .infinity)
+
+        // Top close button inset into safe area
         .safeAreaInset(edge: .top) {
             HStack {
                 Spacer()

@@ -5,6 +5,9 @@
 
 import Foundation
 
+
+/// ViewModel for managing the state of the main tab bar.
 class MainTabBarViewModel: ObservableObject {
-    @Published var selectedTab: BottomTabBarItem = .users
+    /// The currently selected tab in the users tab.
+    @Published var selectedTab: MainTabBarItem = .users
 }

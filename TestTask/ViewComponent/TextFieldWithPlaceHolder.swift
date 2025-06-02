@@ -9,6 +9,7 @@ enum MaskType {
     case phoneNumber
 }
 
+/// A custom text field with floating placeholder, validation, and optional phone mask.
 struct TextFieldWithPlaceHolder: View {
     @Binding var value: String
     var placeholder: String
@@ -36,6 +37,7 @@ struct TextFieldWithPlaceHolder: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             ZStack {
+                // Background and border rectangle
                 RoundedRectangle(cornerRadius: 4)
                     .fill(Color.white)
                     .frame(height: 56)
@@ -43,6 +45,8 @@ struct TextFieldWithPlaceHolder: View {
                         RoundedRectangle(cornerRadius: 4)
                             .stroke(currentState.borderColor)
                     }
+
+                // Floating placeholder text
                 Text(placeholder)
                     .foregroundStyle(currentState.placeHolderColor)
                     .typography(isFocused || !value.isEmpty ? .bodySmall : .body1)
@@ -51,6 +55,7 @@ struct TextFieldWithPlaceHolder: View {
                     .offset(y: isFocused || !value.isEmpty ? -15 : 0)
                     .animation(.linear(duration: 0.1), value: isFocused || !value.isEmpty)
 
+                // If using a phone number mask
                 if let maskType = maskType {
                     switch maskType {
                     case .phoneNumber:
@@ -67,6 +72,7 @@ struct TextFieldWithPlaceHolder: View {
                             .focused($isFocused)
                             .onChange(of: isFocused) { oldFocus, newFocus in
                                 if newFocus {
+                                    // On first focus, insert country prefix
                                     if !wasEverFocused {
                                         wasEverFocused = true
                                     }
@@ -75,6 +81,7 @@ struct TextFieldWithPlaceHolder: View {
                                         displayText = "+38 (0"
                                     }
                                 } else {
+                                    // If unfocused and field is still in initial state, reset
                                     if displayText.hasPrefix("+38 (0") && value.isEmpty {
                                         displayText = ""
                                         value = ""
@@ -82,6 +89,7 @@ struct TextFieldWithPlaceHolder: View {
                                 }
                             }
                             .onChange(of: displayText) { oldValue, newValue in
+                                // Handle live phone formatting and keep raw digits in `value`
                                 if newValue.isEmpty || newValue == "+38 (0" {
                                     if newValue.isEmpty && wasEverFocused && isFocused {
                                         DispatchQueue.main.async {
@@ -107,6 +115,7 @@ struct TextFieldWithPlaceHolder: View {
                             }
                     }
                 } else {
+                    // Default text field without a mask
                     TextField("", text: $value)
                         .foregroundColor(Color.c_black87)
                         .typography(.body1)
@@ -120,12 +129,14 @@ struct TextFieldWithPlaceHolder: View {
                         .focused($isFocused)
                 }
             }
+            // Bottom label (for error message or helper text)
             Text(bottomLabel ?? "")
                 .typography(.bodySmall)
                 .foregroundStyle( !isCorrect ? Color.c_Error : Color.c_black60)
                 .padding(.horizontal, 16)
         }
         .onAppear {
+            // Format text on appear if it's already set (e.g., editing existing user)
             if !value.isEmpty && maskType == .phoneNumber {
                 displayText = formatPhoneNumber(value)
             }
@@ -135,9 +146,12 @@ struct TextFieldWithPlaceHolder: View {
     // Formats a phone number in the format "+38 (XXX) XXX - XX - XX"
     private func formatPhoneNumber(_ value: String) -> String {
         var numbers = String(value).filter { $0.isNumber }
+
+        // Ensure number starts with 0
         if !numbers.hasPrefix("0") {
             numbers = "0" + numbers
         }
+
         let maxDigits = 10
         let limited = String(numbers.prefix(maxDigits))
 

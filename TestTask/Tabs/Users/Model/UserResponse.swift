@@ -5,6 +5,7 @@
 
 import Foundation
 
+// Response model for users API call
 struct UsersResponse: Codable {
     let success: Bool
     let total_pages: Int
