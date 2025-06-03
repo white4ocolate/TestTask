@@ -14,13 +14,6 @@ class UsersViewModel: ObservableObject {
 
     private let count = 6
 
-//    init() {
-//        // Automatically load users when the view model is initialized
-//        Task {
-//            await loadUsers()
-//        }
-//    }
-
     @MainActor
     func loadUsers() async {
         print("loadUsers")

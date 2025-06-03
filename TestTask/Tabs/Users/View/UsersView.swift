@@ -6,7 +6,6 @@
 import SwiftUI
 
 struct UsersView: View {
-//    @StateObject private var vm = UsersViewModel()
     @EnvironmentObject var vm: UsersViewModel
 
     var body: some View {
