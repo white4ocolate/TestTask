@@ -9,6 +9,7 @@ import SwiftUI
 struct MainTabBarView: View {
     /// The view model holding the currently selected tab.
     @StateObject var bottomTabBarVM = MainTabBarViewModel()
+    @EnvironmentObject var usersVM: UsersViewModel
 
     var body: some View {
         ZStack {
@@ -18,8 +19,16 @@ struct MainTabBarView: View {
             switch bottomTabBarVM.selectedTab {
             case .users:
                 UsersView()
+                    .environmentObject(usersVM)
             case .signUp:
                 SignUpView()
+            }
+        }
+        .onChange(of: bottomTabBarVM.selectedTab) {
+            if bottomTabBarVM.selectedTab == .users {
+                Task {
+                    await usersVM.refreshUsers()
+                }
             }
         }
         // Inject custom bottom tab bar.

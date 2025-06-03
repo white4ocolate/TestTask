@@ -6,7 +6,8 @@
 import SwiftUI
 
 struct UsersView: View {
-    @StateObject private var vm = UsersViewModel()
+//    @StateObject private var vm = UsersViewModel()
+    @EnvironmentObject var vm: UsersViewModel
 
     var body: some View {
         ZStack {
@@ -28,11 +29,9 @@ struct UsersView: View {
                             UserCardView(user: user, isLast: user == vm.users.last)
                                 .background(Color.white)
                                 // Load more users when the last one appears
-                                .onAppear {
+                                .task {
                                     if user == vm.users.last && vm.hasMorePages && !vm.isLoading {
-                                        Task {
-                                            await vm.loadUsers()
-                                        }
+                                        await vm.loadUsers()
                                     }
                                 }
                                 // Remove row separators and apply padding
@@ -59,8 +58,4 @@ struct UsersView: View {
             }
         }
     }
-}
-
-#Preview {
-    UsersView()
 }

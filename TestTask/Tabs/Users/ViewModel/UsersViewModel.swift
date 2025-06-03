@@ -14,15 +14,16 @@ class UsersViewModel: ObservableObject {
 
     private let count = 6
 
-    init() {
-        // Automatically load users when the view model is initialized
-        Task {
-            await loadUsers()
-        }
-    }
+//    init() {
+//        // Automatically load users when the view model is initialized
+//        Task {
+//            await loadUsers()
+//        }
+//    }
 
     @MainActor
     func loadUsers() async {
+        print("loadUsers")
         // Prevent duplicate loading and stop if no more pages
         guard !isLoading, hasMorePages else { return }
         isLoading = true
@@ -47,5 +48,18 @@ class UsersViewModel: ObservableObject {
             self.isLoading = false
             self.didLoadOnce = true
         }
+    }
+
+    @MainActor
+    func refreshUsers() async {
+        guard !isLoading else { return }
+
+        // refresh current users
+        users = []
+        currentPage = 1
+        hasMorePages = true
+        didLoadOnce = false
+
+        await loadUsers()
     }
 }

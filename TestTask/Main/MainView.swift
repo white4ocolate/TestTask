@@ -27,12 +27,11 @@ struct MainView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
         }
-        .onAppear {
+        .task {
             // Start the app flow by navigating to the initial screen
-            Task {
-                await router.startApp()
-            }
+            await router.startApp()
         }
+
     }
 }
 
